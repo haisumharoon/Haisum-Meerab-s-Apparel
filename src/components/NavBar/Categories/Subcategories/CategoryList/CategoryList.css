@@ -1,0 +1,12 @@
+.list-container {
+  width: fit-content;
+}
+.cat_name {
+  font-size: 15px;
+  font-weight: 700;
+}
+.subcats li {
+  font-size: 12px;
+  text-decoration: none;
+  list-style-type: none;
+}
