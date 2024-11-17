@@ -2,15 +2,21 @@
   display: flex;
 
   justify-content: center;
-  gap: 100px;
   width: 100%;
   background-color: #3a64b3;
-  padding: 10px 0;
 }
 .categories .item {
   color: white;
   cursor: pointer;
+  padding: 10px 50px;
 }
 .categories .item:hover {
   color: rgb(1, 1, 58);
+}
+#subcategories {
+  display: none;
+}
+
+#subcategories:hover {
+  display: block;
 }

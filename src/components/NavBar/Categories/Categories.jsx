@@ -3,6 +3,7 @@ import "./Categories.css";
 import Subcategories from "./Subcategories/Subcategories";
 
 const Categories = () => {
+  const [subVisible, setSubVisible] = useState(false);
   const [currentCategory, setCurrentCategory] = useState({});
   const categories = [
     {
@@ -42,6 +43,22 @@ const Categories = () => {
           name: "Tops",
           sub_categories: ["winter", "summer", "formal", "casual"],
         },
+        {
+          name: "Frocks",
+          sub_categories: ["winter", "summer", "formal", "casual"],
+        },
+        {
+          name: "Tops",
+          sub_categories: ["winter", "summer", "formal", "casual"],
+        },
+        {
+          name: "Frocks",
+          sub_categories: ["winter", "summer", "formal", "casual"],
+        },
+        {
+          name: "Tops",
+          sub_categories: ["winter", "summer", "formal", "casual"],
+        },
       ],
     },
     {
@@ -66,16 +83,19 @@ const Categories = () => {
             className="item"
             onMouseEnter={() => {
               setCurrentCategory(category);
+              setSubVisible(true);
             }}
             onMouseLeave={() => {
-              setCurrentCategory({});
+              setSubVisible(false);
             }}
           >
             {category.name}
           </div>
         ))}
       </div>
-      {currentCategory && <Subcategories category={currentCategory} />}
+      <div id="subcategories" style={subVisible ? { display: "block" } : {}}>
+        <Subcategories category={currentCategory} />
+      </div>
     </>
   );
 };
