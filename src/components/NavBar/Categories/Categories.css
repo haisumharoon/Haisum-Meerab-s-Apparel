@@ -1,0 +1,16 @@
+.categories {
+  display: flex;
+
+  justify-content: center;
+  gap: 100px;
+  width: 100%;
+  background-color: #3a64b3;
+  padding: 10px 0;
+}
+.categories .item {
+  color: white;
+  cursor: pointer;
+}
+.categories .item:hover {
+  color: rgb(1, 1, 58);
+}
