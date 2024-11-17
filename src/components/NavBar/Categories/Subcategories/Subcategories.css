@@ -1,0 +1,6 @@
+.categorylist {
+  display: flex;
+  gap: 20%;
+  flex-wrap: wrap;
+  background-color: rgb(255, 255, 255);
+}

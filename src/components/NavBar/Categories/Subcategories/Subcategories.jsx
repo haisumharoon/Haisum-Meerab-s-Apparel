@@ -1,5 +1,5 @@
 import CategoryList from "./CategoryList/CategoryList";
-
+import "./Subcategories.css";
 const Subcategories = ({ category }) => {
   return (
     <div className="categorylist">
