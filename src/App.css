@@ -4,9 +4,8 @@
   min-width: 100vw;
   min-height: 100vh;
 }
-
 .brand {
-  margin-top: 130px;
+  margin-top: 140px;
 }
 .listings {
   display: flex;
