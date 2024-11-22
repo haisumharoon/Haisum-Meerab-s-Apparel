@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import Navbar from "./components/NavBar/Navbar";
 import Card from "./components/Card/Card";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [jwtToken, setJwtToken] = useLocalStorage("jwtToken", null);
   const items = [
     {
       images: [
