@@ -30,22 +30,14 @@
   await con.query(`CREATE TABLE IF NOT EXISTS listing (
     listing_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL check (title <> ''),
+    image_path VARCHAR(255) NOT NULL CHECK (image_path <> ''),
     price DECIMAL(10, 2) NOT NULL check (price > 0),
     date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     stock INT NOT NULL
 );`, function (err, result) {
     if (err) throw err;
     console.log("created table listing");
-  });
-  await con.query(`CREATE TABLE IF NOT EXISTS listing_images (
-    listing_id INT NOT NULL,
-    image_path VARCHAR(255) NOT NULL CHECK (image_path <> ''),
-    PRIMARY KEY (listing_id, image_path),
-    FOREIGN KEY (listing_id) REFERENCES listing(listing_id) ON DELETE CASCADE
-);`, function (err, result) {
-    if (err) throw err;
-    console.log("created table listing_images");
-  });
+  }); 
   await con.query(`CREATE TABLE IF NOT EXISTS orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -78,6 +70,7 @@
   await con.query(`CREATE TABLE IF NOT EXISTS categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     cc_id INT NOT NULL,
+    parent_description VARCHAR(255),
     name VARCHAR(255) NOT NULL check (name <> ''),
     FOREIGN KEY (cc_id) REFERENCES customer_category(cc_id) ON DELETE CASCADE
 );`, function (err, result) {
@@ -87,6 +80,7 @@
   await con.query(`CREATE TABLE IF NOT EXISTS sub_categories (
     sub_category_id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
+    parent_description VARCHAR(255),
     name VARCHAR(255) NOT NULL check (name <> ''),
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
 );`, function (err, result) {
