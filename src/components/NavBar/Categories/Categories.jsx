@@ -78,7 +78,7 @@ const Categories = () => {
   return (
     <>
       <div className="categories">
-        {categories.map((category) => (
+        {categories?.map((category) => (
           <div
             className="item"
             onMouseEnter={() => {

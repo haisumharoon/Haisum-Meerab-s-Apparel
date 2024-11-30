@@ -5,7 +5,7 @@ const CategoryList = ({ sub_cat }) => {
       <div className="cat_name">{sub_cat?.name}</div>
       <ul className="subcats">
         {sub_cat?.sub_categories?.map((subsubsub) => (
-          <li>{subsubsub}</li>
+          <li>{subsubsub.name}</li>
         ))}
       </ul>
     </div>
