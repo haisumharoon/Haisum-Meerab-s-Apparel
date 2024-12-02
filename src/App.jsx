@@ -1,196 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import Navbar from "./components/NavBar/Navbar";
 import Card from "./components/Card/Card";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import axios from "axios";
+import UserContext from "./Context/Context";
+import { useParams, useSearchParams } from "react-router-dom";
 
 function App() {
   const [jwtToken, setJwtToken] = useLocalStorage("jwtToken", null);
-  const items = [
-    {
-      images: [
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-      ],
-      title: "red saree",
-      description: "red saree",
-      price: "10000",
-      rating: 4.32,
-    },
-    {
-      images: [
-        "https://faashwear.com/wp-content/uploads/2022/02/7b4335ba-7a3f-4e6a-8eb5-c3165faaed47.jpg",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoP2PaWSPzLu1aDw6OvsGNRX1NG9fgMK0lBg&s",
-      ],
-      title: "green saree",
-      description: "asdioasdjas asd asd ",
-      price: "1000",
-      rating: 3.92,
-    },
-    {
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzvFwmrgRbStLRQjisJeirHMo2nbCbIzO7Dw&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnA8J2k_B2tzInUHzjCdxYpmpsls4wIQ9p4g&s",
-      ],
-      title: "blue saree",
-      description: "this is a serious description",
-      price: "60000",
-      rating: 4.99,
-    },
-    {
-      images: [
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-      ],
-      title: "red saree",
-      description: "red saree",
-      price: "10000",
-      rating: 4.32,
-    },
-    {
-      images: [
-        "https://faashwear.com/wp-content/uploads/2022/02/7b4335ba-7a3f-4e6a-8eb5-c3165faaed47.jpg",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoP2PaWSPzLu1aDw6OvsGNRX1NG9fgMK0lBg&s",
-      ],
-      title: "green saree",
-      description: "asdioasdjas asd asd ",
-      price: "1000",
-      rating: 3.92,
-    },
-    {
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzvFwmrgRbStLRQjisJeirHMo2nbCbIzO7Dw&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnA8J2k_B2tzInUHzjCdxYpmpsls4wIQ9p4g&s",
-      ],
-      title: "blue saree",
-      description: "this is a serious description",
-      price: "60000",
-      rating: 4.99,
-    },
-    {
-      images: [
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-      ],
-      title: "red saree",
-      description: "red saree",
-      price: "10000",
-      rating: 4.32,
-    },
-    {
-      images: [
-        "https://faashwear.com/wp-content/uploads/2022/02/7b4335ba-7a3f-4e6a-8eb5-c3165faaed47.jpg",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoP2PaWSPzLu1aDw6OvsGNRX1NG9fgMK0lBg&s",
-      ],
-      title: "green saree",
-      description: "asdioasdjas asd asd ",
-      price: "1000",
-      rating: 3.92,
-    },
-    {
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzvFwmrgRbStLRQjisJeirHMo2nbCbIzO7Dw&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnA8J2k_B2tzInUHzjCdxYpmpsls4wIQ9p4g&s",
-      ],
-      title: "blue saree",
-      description: "this is a serious description",
-      price: "60000",
-      rating: 4.99,
-    },
-    {
-      images: [
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-      ],
-      title: "red saree",
-      description: "red saree",
-      price: "10000",
-      rating: 4.32,
-    },
-    {
-      images: [
-        "https://faashwear.com/wp-content/uploads/2022/02/7b4335ba-7a3f-4e6a-8eb5-c3165faaed47.jpg",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoP2PaWSPzLu1aDw6OvsGNRX1NG9fgMK0lBg&s",
-      ],
-      title: "green saree",
-      description: "asdioasdjas asd asd ",
-      price: "1000",
-      rating: 3.92,
-    },
-    {
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzvFwmrgRbStLRQjisJeirHMo2nbCbIzO7Dw&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnA8J2k_B2tzInUHzjCdxYpmpsls4wIQ9p4g&s",
-      ],
-      title: "blue saree",
-      description: "this is a serious description",
-      price: "60000",
-      rating: 4.99,
-    },
-    {
-      images: [
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-        "https://www.nameerabyfarooq.com/cdn/shop/files/RoyalPakistaniBridalDressinDeepRedSareeStyle_620x.jpg?v=1689541628",
-        "https://dyot.pk/image/cache/catalog/Saree/IMG_3436-2000x2000.jpg",
-      ],
-      title: "red saree",
-      description: "red saree",
-      price: "10000",
-      rating: 4.32,
-    },
-    {
-      images: [
-        "https://faashwear.com/wp-content/uploads/2022/02/7b4335ba-7a3f-4e6a-8eb5-c3165faaed47.jpg",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoP2PaWSPzLu1aDw6OvsGNRX1NG9fgMK0lBg&s",
-      ],
-      title: "green saree",
-      description: "asdioasdjas asd asd ",
-      price: "1000",
-      rating: 3.92,
-    },
-    {
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzvFwmrgRbStLRQjisJeirHMo2nbCbIzO7Dw&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnA8J2k_B2tzInUHzjCdxYpmpsls4wIQ9p4g&s",
-      ],
-      title: "blue saree",
-      description: "this is a serious description",
-      price: "60000",
-      rating: 4.99,
-    },
-  ];
+  const [items, setItems] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCategory, setSelectedCategory] = useState("");
+  useEffect(() => {
+    var selected_cat = searchParams.get("selected_category");
+    if (selected_cat) {
+      setSelectedCategory(selected_cat);
+    }
+  }, []);
+  useEffect(() => {
+    var url = "http://localhost:5000/listing";
+    if (selectedCategory) {
+      url = `http://localhost:5000/listing/category/${selectedCategory}`;
+    }
+    axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setItems(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [selectedCategory]);
   return (
     <>
-      <Navbar />
+      <UserContext.Provider value={{ selectedCategory, setSelectedCategory }}>
+        <Navbar />
 
-      <img src="HAISUM.jpg" className="brand" />
-      <div className="listings">
-        {items.map((item) => (
-          <Card
-            name={item.title}
-            images={item.images}
-            desc={item.description}
-            rating={item.rating}
-            price={item.price}
-          />
-        ))}
-      </div>
+        <img src="HAISUM.jpg" className="brand" />
+        <div className="listings">
+          {items?.map((item) =>
+            item.stock == 0 ? (
+              <></>
+            ) : (
+              <a href={`/details/${item.listing_id}`}>
+                <Card
+                  name={item.title}
+                  image={`http://localhost:5000/uploads/${item.image_path}`}
+                  price={item.price}
+                />
+              </a>
+            )
+          )}
+        </div>
+      </UserContext.Provider>
     </>
   );
 }
