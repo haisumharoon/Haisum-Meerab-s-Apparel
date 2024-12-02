@@ -43,6 +43,9 @@
     user_id INT NOT NULL,
     listing_id INT NOT NULL,
     amount INT NOT NULL check (amount > 0),
+    longitude DECIMAL(10, 8) NOT NULL,
+    latitude DECIMAL(10, 8) NOT NULL,
+    location VARCHAR(255) NOT NULL check (location <> ''),
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
     FOREIGN KEY (listing_id) REFERENCES listing(listing_id) ON DELETE CASCADE
 );`, function (err, result) {
