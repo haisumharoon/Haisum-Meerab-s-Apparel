@@ -58,8 +58,9 @@ app.get('/uploads/:filename', (req, res) => {
     });
 });
 app.post("/listing",upload.single("file"),(req,res)=>{
-    const {title,stock,price,sub_categories} = req.body 
+    const {title,stock,price,sub_categories: subCategoriesString} = req.body 
     const file = req.file 
+    const sub_categories = subCategoriesString.split(",").map((subCategory)=>parseInt(subCategory))
     console.log(req);
     con.query(`INSERT INTO listing (title,stock,price,image_path) VALUES ("${title}",'${stock}',"${price}","${file.filename}");`, function (err, result) {
         if(err){
@@ -75,23 +76,43 @@ app.post("/listing",upload.single("file"),(req,res)=>{
             return res.status(500).json({message:""+err})
             
         }
-        // sub_categories.forEach((subCategory,index)=>{
-        //     con.query(`INSERT INTO listing_categories (listing_id,sub_category_id) VALUES ("${result.insertId}","${subCategory}");`, function (err, result) {
-        //         if(err){
-        //             return res.status(500).json({message:""+err})
-        //         }
-        //         if(index == sub_categories.length-1){
-        //             return res.status(200).json({message:"Listing created successfully"})
-        //         }
-        //     });
-        // })
-        return res.status(200).json({message:"Listing created successfully"})
+        console.log(sub_categories);
+        try{
+        sub_categories.forEach((subCategory,index)=>{
+            con.query(`INSERT INTO listing_categories (listing_id,sub_category_id) VALUES ("${result.insertId}","${subCategory}");`, function (err, result) {
+                if(err){
+                    return res.status(500).json({message:""+err})
+                }
+                if(index == sub_categories.length-1){
+                    return res.status(200).json({message:"Listing created successfully"})
+                }
+            });
+        })}catch(e){
+             if (file) {
+                const filePath = path.join(__dirname, 'uploads/', file.filename);
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err);
+                    }
+                    console.log("deleted successfully");
+                });
+            }
+            con.query(`DELETE FROM listing WHERE listing_id = "${result.insertId}";`, function (err, result) {});   
+            return res.status(500).json({message:""+e
+        })
+        }
+        if(sub_categories.length == 0 && index == sub_categories.length-1){
+            return res.status(200).json({message:"Listing created successfully"})
+        } 
     });
 })
 app.put("/listing/:id",upload.single("file"),(req,res)=>{
-    const {title,stock,price,sub_categories} = req.body 
-    const file = req.file 
-    con.query(`UPDATE listing SET title = "${title}", stock = "${stock}", price = "${price}", image_path = "${file.filename}" WHERE listing_id = ${req.params.id};`, function (err, result) {
+    console.log(req.body);
+    const {title,stock,price,sub_categories: subCategoriesString} = req.body;
+    const file = req.file; 
+    const sub_categories = subCategoriesString.split(",").map((subCategory)=>parseInt(subCategory))
+
+    con.query(`UPDATE listing SET title = "${title}", stock = "${stock}", price = "${price}"  WHERE listing_id = ${req.params.id};`, function (err, result) {
         if(err){
             return res.status(500).json({message:""+err})
         }
@@ -99,22 +120,24 @@ app.put("/listing/:id",upload.single("file"),(req,res)=>{
             if(err){
                 return res.status(500).json({message:""+err})
             }
+            if(sub_categories.length == 0){
+                return res.status(200).json({message:"Listing updated successfully"})
+            }
             sub_categories.forEach((subCategory,index)=>{
             con.query(`INSERT INTO listing_categories (listing_id,sub_category_id) VALUES ("${req.params.id}","${subCategory}");`, function (err, result) {
                 if(err){
                     return res.status(500).json({message:""+err})
                 }
+                
+                if(index == sub_categories.length-1 ){
+                    return res.status(200).json({message:"Listing updated successfully"})
+                }
             }
             );
-            if(index == sub_categories.length-1){
-                return res.status(200).json({message:"Listing updated successfully"})
-            }
         })
         }
         )
-
-        return res.status(200).json({message:"Listing updated successfully"})
-    });
+      });
 }
 )
 app.delete("/listing/:id",(req,res)=>{
@@ -136,6 +159,28 @@ app.delete("/listing/:id",(req,res)=>{
     });})
 }
 )
+app.get("/admin/listing",(req,res)=>{
+    con.query(`SELECT * FROM listing;`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        if(result.length == 0){
+            return res.status(200).json([])
+        }
+        result.forEach((listing,index)=>{
+            con.query(`select c.sub_category_id from listing_categories lc inner join sub_categories c on lc.sub_category_id = c.sub_category_id where lc.listing_id = ${listing.listing_id};`, function (err, categories) {
+                if(err){
+                    return res.status(500).json({message:""+err})
+                }
+                listing.sub_categories = categories.map((category)=>category.sub_category_id) 
+                if(index == result.length-1){
+                    return res.status(200).json(result)
+                }
+            });
+        })
+    });
+}
+)
 app.get("/listing",(req,res)=>{
     con.query(`SELECT * FROM listing;`, function (err, result) {
         if(err){
@@ -145,11 +190,11 @@ app.get("/listing",(req,res)=>{
             return res.status(200).json([])
         }
         result.forEach((listing,index)=>{
-            con.query(`select c.name from listing_categories lc inner join sub_categories c on lc.sub_category_id = c.sub_category_id where lc.listing_id = ${listing.listing_id};`, function (err, categories) {
+            con.query(`select c.sub_category_id,c.name from listing_categories lc inner join sub_categories c on lc.sub_category_id = c.sub_category_id where lc.listing_id = ${listing.listing_id};`, function (err, categories) {
                 if(err){
                     return res.status(500).json({message:""+err})
                 }
-                listing.sub_categories = categories 
+                listing.sub_categories = categories
                 if(index == result.length-1){
                     return res.status(200).json(result)
                 }
@@ -180,27 +225,98 @@ app.get("/all_categories",(req,res)=>{
                 if(err){
                     return res.status(500).json({message:""+err})
                 }  
+                // if(subCategories.length == 0){
+                //     if(index == result.length-1){
+                //         return res.status(200).json(result)
+                //     }
+                // }
                  subCategories.forEach((subCategory,i)=>{
                     con.query(`SELECT * FROM sub_categories WHERE category_id = ${subCategory.category_id};`, function (err, subSubCategories) {
                         if(err){
                             return res.status(500).json({message:""+err})
                         }
-                        subCategory.sub_categories = subSubCategories 
+                        subCategory.sub_categories = subSubCategories
+                        
+                        console.log(result[0].sub_categories); 
                         if(i == subCategories.length-1 && index == result.length-1){
-                            res.status(200).json(result)
+                           return res.status(200).json(result)
                         }
                     })
-                })
-                if(subCategories.length == 0 && index == result.length-1){
-                    res.status(200).json(result)
-                }
+                }) 
+                
                 category.sub_categories = subCategories 
+                setTimeout(()=>{
+                if(index == result.length-1 && subCategories.length == 0){
+                    return res.status(200).json(result)
+                }},200)
             });
             
         })  
     });
 })
+app.post("/wishlist/:id",authorize_token,(req,res)=>{
+    const {amount} = req.body
+    con.query(`INSERT INTO wishlist (user_id,listing_id,amount) VALUES ("${req.user.id}","${req.params.id}","${amount}");`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        } 
+        return res.status(200).json({message:"Added to wishlist"})
+    });
+}
+)
+app.get("/wishlist",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM listing where listing_id in (SELECT listing_id FROM wishlist WHERE user_id = "${req.user.id}");`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+}
+)
+app.get("/listing/category/:id",(req,res)=>{
+    con.query(`select * from listing where listing_id in (select listing_id from listing_categories where sub_category_id=${req.params.id});`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+})
+app.get("/listing/:id",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM listing WHERE listing_id = ${req.params.id};`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        if(result.length == 0){
+            return res.status(200).json([])
+        }
+        con.query(`select * from listing_categories lc inner join sub_categories c on lc.sub_category_id = c.sub_category_id where lc.listing_id = ${result[0].listing_id};`, function (err, categories) {
+            if(err){
+                return res.status(500).json({message:""+err})
+            }
+            result[0].categories = categories
+            con.query(`select * from wishlist where user_id = ${req.user.id} and listing_id = ${req.params.id};`, function (err, wish) {
+                if(err){
+                    return res.status(500).json({message:""+err})
+                }
+                result[0].wish = wish.length > 0
+                return res.status(200).json(result[0])
+            }
+            );
+        });
+    });
+})
+app.delete("/wishlist/:id",authorize_token,(req,res)=>{
+
+    con.query(`DELETE FROM wishlist WHERE user_id = "${req.user.id}" AND listing_id = "${req.params.id}";`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json({message:"Removed from wishlist"})
+    });
+}
+)
 app.post("/customer-categories",authorize_token,(req,res)=>{
+     
     const {name} = req.body 
     con.query(`INSERT INTO customer_category (name) VALUES ("${name}");`, function (err, result) {
         if(err){
@@ -217,6 +333,21 @@ app.get("/users",authorize_token,(req,res)=>{
         }
         
         return res.status(200).json(result)
+    });
+})
+app.post("/order/:id",authorize_token,(req,res)=>{
+    const {amount,longitude,latitude,location} = req.body 
+    con.query(`INSERT INTO orders (user_id,listing_id,amount,longitude,latitude,location) VALUES ("${req.user.id}","${req.params.id}","${amount}","${longitude}","${latitude}","${location}");`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        con.query(`UPDATE listing SET stock = stock - ${amount} WHERE listing_id = ${req.params.id};`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        console.log("1 record inserted");
+        return res.status(200).json({message:"Order created successfully"})
+    })
     });
 })
 app.post("/users",authorize_token,(req,res)=>{
@@ -421,9 +552,10 @@ app.post("/login", (req,res)=>{
 
 function authorize_token(req,res,next){
     const auth_tkn = req.headers["authorization"]
+    console.log(auth_tkn);
     const token = auth_tkn?.split(" ")[1];
     if(token == null){
-        res.status(401).json({message:"Bad request, no auth"})
+        return res.status(401).json({message:"Bad request, no auth"})
     }
     var decoded;
     try{
