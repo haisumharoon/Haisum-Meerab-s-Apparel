@@ -5,6 +5,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import Modal from "./Modal/Modal";
 import Select from "./CustomInputs/Select";
 import CheckBox from "./CustomInputs/CheckBox";
+import Multiple from "./CustomInputs/Multiple/Multiple";
 
 const TableObjects = ({
   url,
@@ -15,6 +16,7 @@ const TableObjects = ({
   description_property,
 }) => {
   const [objects, setObjects] = useState([]);
+  const [fd, setFd] = useState(new FormData());
   const [error, setError] = useState("");
   const [jwtToken, setJwtToken] = useLocalStorage("jwtToken", null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +44,16 @@ const TableObjects = ({
   };
   useEffect(() => {
     getObjects();
+    attributes?.map((attr) => {
+      setInputs((values) => ({
+        ...values,
+        [attr.name]: "",
+      }));
+    });
   }, []);
+  useEffect(() => {
+    console.log(inputs);
+  }, [inputs]);
   return (
     <>
       <div className="table-cont">
@@ -136,15 +147,22 @@ const TableObjects = ({
           onSubmit={(e) => {
             e.preventDefault();
             var formData = new FormData();
-            for (var key in inputs) {
-              formData.append(key, inputs[key]);
+            attributes?.map((attr) => {
+              if (attr.type == "file") {
+                formData.append(attr.name, inputs.file);
+              } else {
+                formData.append(attr.name, inputs[attr.name]);
+              }
+            });
+
+            for (var pair of formData.entries()) {
+              console.log(pair[0] + ", " + pair[1]);
             }
+            const hasFile = attributes.some((attr) => attr.type === "file");
             axios
-              .post(url, formData, {
+              .post(url, hasFile ? formData : inputs, {
                 headers: {
                   Authorization: `Bearer ${jwtToken}`,
-                  Accept: "form-data",
-                  "Content-Type": "multipart/form-data",
                 },
               })
               .then((res) => {
@@ -188,13 +206,25 @@ const TableObjects = ({
                     ) : attr.type == "file" ? (
                       <input
                         type="file"
-                        name="file"
+                        style={{ margin: "20px" }}
+                        name={attr.name}
+                        accept="image/*"
                         onChange={(e) => {
                           setInputs((values) => ({
                             ...values,
                             file: e.target.files[0],
                           }));
                         }}
+                      />
+                    ) : attr.type == "multiple" ? (
+                      <Multiple
+                        name={attr.name}
+                        setId={setInputs}
+                        inputs={inputs}
+                        url={attr.url}
+                        id_prop={attr.id_prop}
+                        defining_prop={attr.defining_prop}
+                        descriptive_prop={attr.descriptive_prop}
                       />
                     ) : (
                       <input
@@ -222,107 +252,135 @@ const TableObjects = ({
           setIsSelectModalOpen(false);
         }}
       >
-        {attributes?.map((attr, index) => {
-          return (
-            <div className="field">
-              <label className="label">{attr.name}</label>
-              <div className="control">
-                {attr.type == "select" ? (
-                  <Select
-                    name={attr.name}
-                    setValueInObject={setInputs}
-                    descriptive_prop={attr.descriptive_prop}
-                    valueInObject={inputs}
-                    url={attr.url}
-                    defining_prop={attr.defining_prop}
-                  />
-                ) : attr.type == "checkbox" ? (
-                  <CheckBox
-                    valueInObject={inputs}
-                    setValueInObject={setInputs}
-                    name={attr.name}
-                  />
-                ) : attr.type == "textarea" ? (
-                  <textarea
-                    // className="forminput"
-                    name={attr.name}
-                    value={inputs[attr.name]}
-                    onChange={handleChange}
-                  ></textarea>
-                ) : attr.type == "file" ? (
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      setInputs((values) => ({
-                        ...values,
-                        file: e.target.files[0],
-                      }));
-                    }}
-                  />
-                ) : (
-                  <input
-                    className="forminput"
-                    type={attr.type}
-                    name={attr.name}
-                    value={inputs[attr.name]}
-                    onChange={handleChange}
-                    required
-                  />
-                )}
-              </div>
-            </div>
-          );
-        })}
-        <div className="error">{error}</div>
-        <div className="action-buttons">
-          <button
-            style={{ backgroundColor: "#c78c20" }}
-            className="formButton"
-            onClick={() => {
-              var formData = new FormData();
-              for (var key in inputs) {
-                formData.append(key, inputs[key]);
+        <form
+          action=""
+          onSubmit={(e) => {
+            e.preventDefault();
+            var formData = new FormData();
+
+            attributes?.map((attr) => {
+              if (attr.type === "file") {
+                formData.append(attr.name, inputs.file);
+              } else {
+                formData.append(attr.name, inputs[attr.name]);
               }
-              axios
-                .put(`${url}/${inputs[id_name]}`, formData, {
-                  headers: {
-                    Authorization: `Bearer ${jwtToken}`,
-                    "Content-Type": "multipart/form-data",
-                    Accept: "form-data",
-                  },
-                })
-                .then((res) => {
-                  location.reload();
-                })
-                .catch((err) => {
-                  console.log(err);
-                  setError(err.response.data.message);
-                });
-            }}
-          >
-            Edit
-          </button>
-          <button
-            className="formButton"
-            style={{ backgroundColor: "red" }}
-            onClick={() => {
-              axios
-                .delete(`${url}/${inputs[id_name]}`, {
+            });
+            console.log(formData);
+            axios
+              .put(
+                `${url}/${inputs[id_name]}`,
+                attributes.some((attr) => attr.type == "file")
+                  ? formData
+                  : inputs,
+                {
                   headers: {
                     Authorization: `Bearer ${jwtToken}`,
                   },
-                })
-                .then((res) => {
-                  location.reload();
-                })
-                .catch((err) => {
-                  setError(err.response.data.message);
-                });
-            }}
-          >
-            Delete
-          </button>
-        </div>
+                }
+              )
+              .then((res) => {
+                console.log(res);
+                // location.reload();
+              })
+              .catch((err) => {
+                console.log(err);
+                setError(err.response.data.message);
+              });
+          }}
+        >
+          {attributes?.map((attr, index) => {
+            return (
+              <div className="field">
+                <label className="label">{attr.name}</label>
+                <div className="control">
+                  {attr.type == "select" ? (
+                    <Select
+                      name={attr.name}
+                      setValueInObject={setInputs}
+                      descriptive_prop={attr.descriptive_prop}
+                      valueInObject={inputs}
+                      url={attr.url}
+                      defining_prop={attr.defining_prop}
+                    />
+                  ) : attr.type == "checkbox" ? (
+                    <CheckBox
+                      valueInObject={inputs}
+                      setValueInObject={setInputs}
+                      name={attr.name}
+                    />
+                  ) : attr.type == "textarea" ? (
+                    <textarea
+                      // className="forminput"
+                      name={attr.name}
+                      value={inputs[attr.name]}
+                      onChange={handleChange}
+                    ></textarea>
+                  ) : attr.type == "file" ? (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        setInputs((values) => ({
+                          ...values,
+                          file: e.target.files[0],
+                        }));
+                      }}
+                    />
+                  ) : attr.type == "multiple" ? (
+                    <Multiple
+                      name={attr.name}
+                      setId={setInputs}
+                      inputs={inputs}
+                      url={attr.url}
+                      id_prop={attr.id_prop}
+                      defining_prop={attr.defining_prop}
+                      descriptive_prop={attr.descriptive_prop}
+                    />
+                  ) : (
+                    <input
+                      className="forminput"
+                      type={attr.type}
+                      name={attr.name}
+                      value={inputs[attr.name]}
+                      onChange={handleChange}
+                      required
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          <div className="error">{error}</div>
+          <div className="action-buttons">
+            <button
+              style={{ backgroundColor: "#c78c20" }}
+              className="formButton"
+              type="submit"
+            >
+              Edit
+            </button>
+            <button
+              className="formButton"
+              style={{ backgroundColor: "red" }}
+              onClick={() => {
+                axios
+                  .delete(`${url}/${inputs[id_name]}`, {
+                    headers: {
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                  })
+                  .then((res) => {
+                    location.reload();
+                  })
+                  .catch((err) => {
+                    setError(err.response.data.message);
+                  });
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </form>
       </Modal>
     </>
   );
