@@ -9,4 +9,9 @@
   font-size: 12px;
   text-decoration: none;
   list-style-type: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.subcats li:hover {
+  color: blue;
 }
