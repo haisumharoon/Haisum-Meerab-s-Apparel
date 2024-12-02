@@ -90,7 +90,7 @@ const Admin = () => {
       <TableObjects
         table_title={"Listings"}
         // description_property={""}
-        url={"http://localhost:5000/listing"}
+        url={"http://localhost:5000/admin/listing"}
         attributes={[
           { name: "title", type: "text" },
           { name: "stock", type: "number" },
@@ -101,6 +101,7 @@ const Admin = () => {
             type: "multiple",
             url: "http://localhost:5000/sub-categories",
             defining_prop: "name",
+            id_prop: "sub_category_id",
             descriptive_prop: "parent_description",
           },
         ]}
