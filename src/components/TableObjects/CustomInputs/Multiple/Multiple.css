@@ -1,0 +1,35 @@
+.selected {
+  width: fit-content;
+  border: 1px solid #00000056;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 5px;
+  border-radius: 5px;
+}
+.selected select {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #000000c7;
+}
+.items {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px;
+  font: 400 12px Arial;
+}
+.selected-item {
+  cursor: pointer;
+  border: 1px solid #00000056;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+.selected-item:hover {
+  background-color: rgb(167, 55, 55);
+  color: white;
+}
