@@ -8,6 +8,7 @@ import Register from "./Register.jsx";
 import Admin from "./Admin.jsx";
 import Details from "./Details.jsx";
 import WishList from "./WishList.jsx";
+import Orders from "./Orders.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -18,6 +19,7 @@ createRoot(document.getElementById("root")).render(
       <Route path="/admin" element={<Admin />} />
       <Route path="/wishlist" element={<WishList />} />
       <Route path="/details/:id" element={<Details />} />
+      <Route path="/orders" element={<Orders />} />
     </Routes>
   </BrowserRouter>
 );
