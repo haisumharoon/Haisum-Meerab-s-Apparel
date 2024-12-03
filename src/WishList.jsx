@@ -22,9 +22,14 @@ const WishList = () => {
         console.log(res.data);
       });
   }, []);
+
+  const selectedCategory = {};
+  const setSelectedCategory = (category) => {
+    window.location.href = "/?selected_category=" + category;
+  };
   return (
     <>
-      <UserContext.Provider value={{}}>
+      <UserContext.Provider value={{ selectedCategory, setSelectedCategory }}>
         <Navbar />
       </UserContext.Provider>
       <h1
