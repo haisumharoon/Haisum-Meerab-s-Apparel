@@ -3,10 +3,12 @@ import "./Navbar.css"; // We'll create this CSS file for styling
 import Searchbar from "./Searchbar/Searchbar";
 import Categories from "./Categories/Categories";
 import Dropdown from "./Dropdown/Dropdown";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const Navbar = ({ isLoggedIn }) => {
   const [showDD, setShowDD] = useState(false);
   const navbar_ref = useRef();
+  const [jwtToken, setJwtToken] = useLocalStorage("jwtToken", null);
 
   let prevScrollPos = window.pageYOffset; // Store the initial scroll position
   window.onscroll = function () {
@@ -54,7 +56,7 @@ const Navbar = ({ isLoggedIn }) => {
             </a>
           </li>
           <li>
-            <a href="/wishlist">
+            <a href={jwtToken == null ? "/login" : "/wishlist"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="26"
@@ -68,7 +70,22 @@ const Navbar = ({ isLoggedIn }) => {
             </a>
           </li>
           <li>
-            <a href={isLoggedIn ? "#" : "./login"}>
+            <a href={jwtToken == null ? "/login" : "/orders"}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                fill="currentColor"
+                class="bi bi-card-checklist"
+                viewBox="0 0 16 16"
+              >
+                <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z" />
+                <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0" />
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a href={jwtToken != null ? "#" : "./login"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="26"
