@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Navbar.css"; // We'll create this CSS file for styling
 import Searchbar from "./Searchbar/Searchbar";
 import Categories from "./Categories/Categories";
@@ -7,12 +7,20 @@ import Dropdown from "./Dropdown/Dropdown";
 const Navbar = ({ isLoggedIn }) => {
   const [showDD, setShowDD] = useState(false);
   const navbar_ref = useRef();
-  let prevScrollPos = window.pageYOffset; // Store the initial scroll position
 
+  let prevScrollPos = window.pageYOffset; // Store the initial scroll position
   window.onscroll = function () {
     let currentScrollPos = window.pageYOffset; // Get the current scroll position
     let navbar = navbar_ref.current; // Get the navbar element
-
+    if (currentScrollPos == 0) {
+      document.getElementById("nbt").style.backgroundColor = "#00000000";
+      document.getElementById("categories").style.display = "none";
+    } else {
+      document.getElementById("nbt").style.backgroundColor =
+        "rgb(31, 156, 214)";
+      document.getElementById("categories").style.backgroundColor = "#3a64b3";
+      document.getElementById("categories").style.display = "flex";
+    }
     if (prevScrollPos > currentScrollPos) {
       // Scrolling up, show navbar
       navbar.style.top = "0";
@@ -25,7 +33,7 @@ const Navbar = ({ isLoggedIn }) => {
   };
   return (
     <nav className="navbar" ref={navbar_ref}>
-      <div className="navbar-top">
+      <div className="navbar-top" id="nbt">
         <div className="logo">
           <Searchbar />
         </div>
