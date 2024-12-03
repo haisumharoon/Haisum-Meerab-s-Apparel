@@ -17,7 +17,7 @@ const Categories = () => {
   }, []);
   return (
     <>
-      <div className="categories">
+      <div className="categories" id="categories">
         {categories?.map((category) => (
           <div
             className="item"
@@ -38,7 +38,7 @@ const Categories = () => {
             setSelectedCategory("");
           }}
         >
-          All
+          all
         </div>
       </div>
       <div id="subcategories" style={subVisible ? { display: "block" } : {}}>
