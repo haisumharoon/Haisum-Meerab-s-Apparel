@@ -3,3 +3,22 @@
   flex-wrap: wrap;
   width: 100%;
 }
+.orders-container {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+.orders {
+  margin: 50px 80px;
+  padding: 10px;
+  border: 2px solid #008807;
+  color: #008807;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+}
+.orders:hover {
+  background-color: #008807;
+  color: rgb(255, 255, 255);
+}
