@@ -380,6 +380,15 @@ app.post("/users",authorize_token,(req,res)=>{
     });
     });
 })
+app.get("/user/:id",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM user WHERE user_id = "${req.params.id}";`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+}
+)
 app.put("/users/:id",authorize_token,(req,res)=>{
     const {name,username,email,password,isAdmin} = req.body 
     con.query(`UPDATE user SET name = "${name}", isAdmin = "${isAdmin}" WHERE credential_id = "${req.params.id}";`, function (err, result) {
@@ -563,6 +572,39 @@ app.post("/login", (req,res)=>{
     );
     });
 });
+app.get("/all_orders",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM orders;`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+}) 
+app.get("/order/:id",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM orders WHERE order_id = ${req.params.id};`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result[0])
+    });
+}
+)
+app.delete("/order/:id",authorize_token,(req,res)=>{
+    con.query(`DELETE FROM orders WHERE order_id = ${req.params.id};`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json({message:"Order deleted successfully"})
+    });
+})
+app.get("/orders",authorize_token,(req,res)=>{
+    con.query(`SELECT * FROM orders WHERE user_id = ${req.user.id};`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+})
 
 function authorize_token(req,res,next){
     const auth_tkn = req.headers["authorization"]
