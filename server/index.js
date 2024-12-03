@@ -281,6 +281,20 @@ app.get("/listing/category/:id",(req,res)=>{
         return res.status(200).json(result)
     });
 })
+app.get("/listing/search/:query",(req,res)=>{
+    const selectedCategory = req.query.selected_category;
+    var query = `SELECT * FROM listing WHERE title LIKE '%${req.params.query}%'`;
+    if(selectedCategory){
+        query = `SELECT * FROM listing WHERE title LIKE '%${req.params.query}%' AND listing_id in (SELECT listing_id FROM listing_categories WHERE sub_category_id = ${selectedCategory})`
+    }
+    con.query(query, function (err, result) {
+        
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        return res.status(200).json(result)
+    });
+})
 app.get("/listing/:id",authorize_token,(req,res)=>{
     con.query(`SELECT * FROM listing WHERE listing_id = ${req.params.id};`, function (err, result) {
         if(err){
