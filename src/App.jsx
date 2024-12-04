@@ -9,6 +9,7 @@ import axios from "axios";
 import UserContext from "./Context/Context";
 import { useParams, useSearchParams } from "react-router-dom";
 import FrontDisplay from "./components/FrontDisplay/FrontDisplay";
+import ChatBot from "./components/ChatBot/ChatBot";
 
 function App() {
   const [jwtToken, setJwtToken] = useLocalStorage("jwtToken", null);
