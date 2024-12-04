@@ -1,10 +1,11 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const PeerContext = createContext();
 export const usePeer = () => {
   return useContext(PeerContext);
 };
 export const PeerProvider = ({ children }) => {
+  const [remoteStream, setRemoteStream] = useState(null);
   const peer = useMemo(
     () =>
       new RTCPeerConnection({
@@ -45,10 +46,27 @@ export const PeerProvider = ({ children }) => {
   const sendStream = async (stream) => {
     stream.getTracks().forEach((track) => peer.addTrack(track, stream));
   };
-
+  const handleTrackEvent = (ev) => {
+    const streams = ev;
+    setRemoteStream(streams[0]);
+  };
+  useEffect(() => {
+    peer.addEventListener("track", handleTrackEvent);
+    return () => {
+      peer.removeEventListener("track", handleTrackEvent);
+    };
+  }, []);
   return (
     <PeerContext.Provider
-      value={{ peer, createOffer, createAnswer, setRemoteAnswer }}
+      value={{
+        peer,
+        createOffer,
+        createAnswer,
+        setRemoteAnswer,
+        sendStream,
+        remoteStream,
+        setRemoteStream,
+      }}
     >
       {children}
     </PeerContext.Provider>

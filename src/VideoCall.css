@@ -1,0 +1,25 @@
+.navtop {
+  padding: 20px 10px;
+  background-color: rgb(55, 57, 190);
+  top: 0;
+  left: 0;
+  right: 0;
+  position: fixed;
+  display: flex;
+  gap: 10px;
+  font-size: 18px;
+  color: white;
+  align-items: center;
+  justify-content: start;
+}
+a {
+  height: 26px;
+}
+.call {
+  margin-top: 120px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  width: 100%;
+}

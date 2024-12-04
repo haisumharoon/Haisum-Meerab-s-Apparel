@@ -16,8 +16,8 @@ import ChatBotPage from "./ChatBotPage.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <PeerProvider>
-      <SocketProvider>
+    <SocketProvider>
+      <PeerProvider>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/register" element={<Register />} />
@@ -29,7 +29,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/chatbot" element={<ChatBotPage />} />
           <Route path="/meet" element={<VideoCall />} />
         </Routes>
-      </SocketProvider>
-    </PeerProvider>
+      </PeerProvider>
+    </SocketProvider>
   </BrowserRouter>
 );
