@@ -9,17 +9,27 @@ import Admin from "./Admin.jsx";
 import Details from "./Details.jsx";
 import WishList from "./WishList.jsx";
 import Orders from "./Orders.jsx";
+import VideoCall from "./VideoCall.jsx";
+import { SocketProvider } from "./Context/Socket.jsx";
+import { PeerProvider } from "./Context/Peer.jsx";
+import ChatBotPage from "./ChatBotPage.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/wishlist" element={<WishList />} />
-      <Route path="/details/:id" element={<Details />} />
-      <Route path="/orders" element={<Orders />} />
-    </Routes>
+    <PeerProvider>
+      <SocketProvider>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/wishlist" element={<WishList />} />
+          <Route path="/details/:id" element={<Details />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/chatbot" element={<ChatBotPage />} />
+          <Route path="/meet" element={<VideoCall />} />
+        </Routes>
+      </SocketProvider>
+    </PeerProvider>
   </BrowserRouter>
 );
