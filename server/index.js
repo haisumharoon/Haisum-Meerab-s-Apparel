@@ -7,8 +7,46 @@ const mysql = require('mysql');
 const createTables = require("./tables")
 const jwt = require("jsonwebtoken")
 const fs = require('fs');
+const {Server } = require("socket.io")
 require("dotenv").config()
 
+const io = new Server({
+    cors:true
+})
+const nameSocketMapping = new Map()
+const socketNameMapping = new Map()
+io.on("connection",(socket)=>{
+    console.log("connected"); 
+    socket.on("join-room",(data)=>{
+        socket.join("room"); 
+        const decoded = jwt.verify(data.token,process.env.ACCESSTOKEN);
+        console.log("joined room: "+decoded.id);
+        con.query(`SELECT * FROM user WHERE user_id = "${decoded.id}";`, function (err, result) {
+        if(err){
+            return res.status(500).json({message:""+err})
+        }
+        socket.broadcast.to("room").emit("message", { message: `${result[0].name} joined the room`,user_name:result[0].name });
+        nameSocketMapping.set(result[0].name,socket.id)
+        socketNameMapping.set(socket.id,result[0].name)
+        socket.emit("joined", { message: `Welcome ${result[0].name}`,user_name:result[0].name });
+    }
+    ) 
+    }
+    )
+    socket.on("offer",(data)=>{
+        const {offer,name} = data
+        const socketId = nameSocketMapping.get(name)
+        socket.to(socketId).emit("incoming_call", { offer: offer,name:name});
+    }
+    )
+    socket.on("call-accepted",(data)=>{
+        const {answer,name} = data
+        const socketId = nameSocketMapping.get(name)
+        socket.to(socketId).emit("incoming-call", { answer: answer });
+    } 
+    )
+})
+io.listen(5001)
 const app = express();
 const PORT = process.env.PORT || 5000;
 
